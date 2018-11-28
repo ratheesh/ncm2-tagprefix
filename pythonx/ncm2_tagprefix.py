@@ -14,16 +14,52 @@ class Source(Ncm2Source):
         base = ctx['base']
         tags = {}
 
+        #  logger.info('base: %s', base)
         for name in tagfiles:
             try:
                 p = path.join(cwd, name)
+                #  logger.info('path: %s', p)
                 for line in binary_search_lines_by_prefix(base, p):
-                    fields = line.split("\t")
+                    #  fields = line.split("\t")
+                    #
+                    #  if len(fields)<2:
+                    #      continue
+                    #
+                    #  _fsig = fields[2]
+                    #  m = re.search(r'/\^(.*?)\$/;"', fields[2])
+                    #  if m:
+                    #      _fsig = m.group(1)
+                    #  else:
+                    #      _fsig = ''
+                    #  tags[fields[0]] = dict(word=fields[0], menu=_fsig)
 
-                    if len(fields)<2:
-                        continue
+                    #  folowing code is lifted from deoplete tag source file
+                    cols = line.strip().split('\t', 2)
+                    if not cols or cols[0].startswith('!_'):
+                        return {}
 
-                    tags[fields[0]] = dict(word=fields[0], menu=fields[1])
+                    tagfield = {}
+                    if ';"' in cols[-1]:
+                        cols[-1], fields = cols[-1].split(';"', 1)
+                        for pair in fields.split('\t'):
+                            if ':' not in pair:
+                                tagfield['_kind'] = pair
+                            else:
+                                k, v = pair.split(':', 1)
+                                tagfield[k] = v
+
+                    _kind = tagfield.get('_kind', '')
+                    if _kind == 'f':
+                        i = cols[2].find('(')
+                        if i != -1 and cols[2].find(')', i+1) != -1:
+                            m = re.search(r'(\w+\(.*\))', cols[2])
+                            if m:
+                                #  logger.info('m.group(1): %s', m.group(1))
+                                #  print('word:%s,abbr:%s,_kind:%s' % (cols[0], m.group(1), _kind))
+                                tags[cols[0]] = dict(word=cols[0], kind=_kind, menu=m.group(1))
+                    #  print('word:%s,kind:%s' % (cols[0], kind))
+                    else:
+                        tags[cols[0]] = dict(word=cols[0], kind=_kind)
             except Exception as ex:
                 logger.exception('failed searching %s', name)
 

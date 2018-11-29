@@ -60,7 +60,7 @@ class Source(Ncm2Source):
                                 #  tags[cols[0]] = dict(word=cols[0], kind=_kind, menu=m.group(1))
                                 _fsignature=m.group(1)
                     #  print('word:%s,kind:%s' % (cols[0], kind))
-                    tags[cols[0]] = dict(word=cols[0], kind=_kind, abbr=_fsignature)
+                    tags[cols[0]] = dict(word=cols[0], kind=_kind, abbr=_fsignature, menu=cols[1])
             except Exception as ex:
                 logger.exception('failed searching %s', name)
 

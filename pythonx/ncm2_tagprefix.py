@@ -49,6 +49,7 @@ class Source(Ncm2Source):
                                 tagfield[k] = v
 
                     _kind = tagfield.get('_kind', '')
+                    _fsignature=''
                     if _kind == 'f':
                         i = cols[2].find('(')
                         if i != -1 and cols[2].find(')', i+1) != -1:
@@ -56,10 +57,10 @@ class Source(Ncm2Source):
                             if m:
                                 #  logger.info('m.group(1): %s', m.group(1))
                                 #  print('word:%s,abbr:%s,_kind:%s' % (cols[0], m.group(1), _kind))
-                                tags[cols[0]] = dict(word=cols[0], kind=_kind, menu=m.group(1))
+                                #  tags[cols[0]] = dict(word=cols[0], kind=_kind, menu=m.group(1))
+                                _fsignature=m.group(1)
                     #  print('word:%s,kind:%s' % (cols[0], kind))
-                    else:
-                        tags[cols[0]] = dict(word=cols[0], kind=_kind)
+                    tags[cols[0]] = dict(word=cols[0], kind=_kind, abbr=_fsignature)
             except Exception as ex:
                 logger.exception('failed searching %s', name)
 
